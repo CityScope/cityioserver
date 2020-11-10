@@ -17,18 +17,18 @@ async function getCityIO(url) {
     var myHeaders = {
         headers: new Headers({
             Authorization:
-                "Bearer 86c1e6d8f574a51896bf02e8622b858d573b8afd4e583d3b9258cfe8ed336ee7"
-        })
+                "Bearer 86c1e6d8f574a51896bf02e8622b858d573b8afd4e583d3b9258cfe8ed336ee7",
+        }),
     };
 
     return fetch(url, myHeaders)
-        .then(function(response) {
+        .then(function (response) {
             return response.json();
         })
-        .then(function(cityIOdata) {
+        .then(function (cityIOdata) {
             return cityIOdata;
         })
-        .catch(err => {
+        .catch((err) => {
             console.log(err);
         });
 }
@@ -38,18 +38,18 @@ async function postCityIO(url, data) {
     var myHeaders = {
         headers: new Headers({
             Authorization:
-                "Bearer 86c1e6d8f574a51896bf02e8622b858d573b8afd4e583d3b9258cfe8ed336ee7"
+                "Bearer 86c1e6d8f574a51896bf02e8622b858d573b8afd4e583d3b9258cfe8ed336ee7",
         }),
         method: "POST",
-        body: JSON.stringify(data) // body data type must match "Content-Type" header
+        body: JSON.stringify(data), // body data type must match "Content-Type" header
     };
 
     return fetch(url, myHeaders)
-        .then(function(response) {
+        .then(function (response) {
             return response.json();
         })
 
-        .catch(err => {
+        .catch((err) => {
             console.log(err);
 
             return JSON.stringify(err);
@@ -67,9 +67,9 @@ function clearNames(url) {
 async function getTables() {
     let counter = 0;
     let tableArray = [];
-    let cityIOurl = "https://cityio.media.mit.edu/api/tables/list";
+    let cityioTablesList = "https://cityio.media.mit.edu/api/tables/list";
 
-    const tables = await getCityIO(cityIOurl);
+    const tables = await getCityIO(cityioTablesList);
 
     for (let i = 0; i < tables.length; i++) {
         let thisTable = await getCityIO(tables[i]);
@@ -79,9 +79,15 @@ async function getTables() {
             let thisTableName = clearNames(tables[i]);
             infoDiv(
                 i +
-                    " of " +
+                    1 +
+                    "/" +
                     tables.length +
-                    " CityScope tables: " +
+               
+                    " _ ".link(
+                        "https://cityio.media.mit.edu/api/table/clear/" +
+                            thisTableName
+                    ) +
+                    "   " +
                     clearNames(tables[i]).link(tables[i])
             );
 
@@ -104,7 +110,7 @@ async function getTables() {
                 url: tables[i],
                 name: thisTableName,
                 lat: tableSpatial.latitude,
-                lon: tableSpatial.longitude
+                lon: tableSpatial.longitude,
             });
         }
     }
@@ -121,7 +127,7 @@ function makeMap(tablesArray) {
         "https://api.mapbox.com/styles/v1/relnox/cjg1ixe5s2ubp2rl3eqzjz2ud/tiles/512/{z}/{x}/{y}?access_token=pk.eyJ1IjoicmVsbm94IiwiYSI6ImNqd2VwOTNtYjExaHkzeXBzYm1xc3E3dzQifQ.X8r8nj4-baZXSsFgctQMsg",
         {
             maxZoom: 15,
-            minZoom: 2
+            minZoom: 2,
         }
     ).addTo(map);
     //hide leaflet link
@@ -144,13 +150,13 @@ function makeMap(tablesArray) {
         popupAnchor: [0, -40],
         shadowUrl: shadow.default,
         shadowSize: [iconSize, iconSize],
-        shadowAnchor: [0, 10]
+        shadowAnchor: [0, 10],
     });
 
     for (var i = 0; i < tablesArray.length; i++) {
         let rndPos = [
             tablesArray[i].lat + Math.random() * 10,
-            tablesArray[i].lon + Math.random() * 10
+            tablesArray[i].lon + Math.random() * 10,
         ];
         var polylinePoints = [rndPos, [tablesArray[i].lat, tablesArray[i].lon]];
 
@@ -159,7 +165,7 @@ function makeMap(tablesArray) {
             width: "1px",
             weight: 3,
             opacity: 0.5,
-            smoothFactor: 1
+            smoothFactor: 1,
         }).addTo(map);
 
         //clear names of tables
@@ -167,19 +173,19 @@ function makeMap(tablesArray) {
         url = clearNames(url);
         //create map marker
         let marker = new L.marker(rndPos, {
-            icon: IOIcon
+            icon: IOIcon,
         })
             .bindPopup("CityScope " + url)
             .addTo(map);
         marker.properties = tablesArray[i];
 
-        marker.on("mouseover", function() {
+        marker.on("mouseover", function () {
             this.openPopup();
         });
-        marker.on("mouseout", function() {
+        marker.on("mouseout", function () {
             this.closePopup();
         });
-        marker.on("click", function() {
+        marker.on("click", function () {
             //pass the marker data to setup method
             modalSetup(marker);
             infoDiv("getting header for: " + url);
@@ -202,7 +208,7 @@ function makeMap(tablesArray) {
         let responseDiv = document.getElementById("responseDiv");
         responseDiv.innerHTML = "server response will appear here..";
         var postButton = document.getElementById("post");
-        postButton.onclick = async function(event) {
+        postButton.onclick = async function (event) {
             event.preventDefault();
             var fieldName = document.getElementById("fieldName");
             var JSONdata = document.getElementById("JSONdata");
@@ -227,7 +233,8 @@ function makeMap(tablesArray) {
         };
 
         var deleteButton = document.getElementById("delete");
-        deleteButton.onclick = async function(event) {
+
+        deleteButton.onclick = async function (event) {
             event.preventDefault();
             var moduleName = document.getElementById("fieldName");
             let delFieldURL =
@@ -237,14 +244,14 @@ function makeMap(tablesArray) {
         };
 
         //stop update on modal close
-        $("#modal").on("hide.bs.modal", function() {
+        $("#modal").on("hide.bs.modal", function () {
             clearInterval(refreshIntervalId);
         });
 
         update(tableMeta.url);
         //start interval fix set interval that way:
         //http://onezeronull.com/2013/07/12/function-is-not-defined-when-using-setinterval-or-settimeout/
-        var refreshIntervalId = setInterval(function() {
+        var refreshIntervalId = setInterval(function () {
             update(tableMeta.url);
         }, updateInterval);
         //open up the modal
@@ -281,7 +288,7 @@ function syntaxHighlight(json) {
         .replace(/>/g, "&gt;");
     return json.replace(
         /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
-        function(match) {
+        function (match) {
             var cls = "number";
             if (/^"/.test(match)) {
                 if (/:$/.test(match)) {
@@ -316,5 +323,3 @@ function infoDiv(text) {
 // APP START
 //////////////////////////////////////////
 getTables();
-
-// getCityIO("https://cityio.media.mit.edu/api/table/hidden_table", myHeaders);

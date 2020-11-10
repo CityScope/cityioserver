@@ -21,11 +21,11 @@
     "homepage": "https://github.com/CityScope/cityio#readme",
     "dependencies": {
         "babel-polyfill": "^6.26.0",
-        "bootstrap": "^4.5.0",
+        "bootstrap": "^4.5.3",
         "eslint": "^5.13.0",
         "font-awesome": "^4.7.0",
         "jquery": "^3.5.1",
-        "leaflet": "^1.6.0",
+        "leaflet": "^1.7.1",
         "popper.js": "^1.16.1"
     },
     "devDependencies": {
